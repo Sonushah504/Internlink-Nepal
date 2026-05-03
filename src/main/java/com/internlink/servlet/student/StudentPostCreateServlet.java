@@ -16,7 +16,6 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -46,7 +45,6 @@ public class StudentPostCreateServlet extends HttpServlet {
             }
 
             StudentPost post = new StudentPost();
-            post.setId(UUID.randomUUID().toString());
             post.setUserId(profile.getUserId());
             post.setStudentId(profile.getId());
             post.setStudentName(profile.getFullName());
@@ -57,27 +55,20 @@ public class StudentPostCreateServlet extends HttpServlet {
             post.setCreatedAt(LocalDateTime.now());
 
             if (media != null && media.getSize() > 0) {
-                String submitted = Paths.get(media.getSubmittedFileName()).getFileName().toString();
+                String submitted = Path.of(media.getSubmittedFileName()).getFileName().toString();
                 String extension = submitted.contains(".") ? submitted.substring(submitted.lastIndexOf('.')) : "";
-                String mediaType = media.getContentType() != null && media.getContentType().startsWith("video") ? "VIDEO" : "IMAGE";
+                String mediaType = media.getContentType() != null && media.getContentType().startsWith("video") ? "VIDEO" : "PHOTO";
+                String uploadFolder = "VIDEO".equals(mediaType) ? "posts/videos" : "posts/photos";
                 String filename = UUID.randomUUID() + extension;
-                try {
-                    Path target = com.internlink.util.StorageUtil.uploadsPath("posts", filename);
-                    Files.copy(media.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-                    post.setMediaType(mediaType);
-                    post.setMediaPath(com.internlink.util.StorageUtil.webPath("posts", filename));
-                } catch (Exception ex) {
-                    Path uploadDir = Paths.get(req.getServletContext().getRealPath("/uploads/posts"));
-                    Files.createDirectories(uploadDir);
-                    Files.copy(media.getInputStream(), uploadDir.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-                    post.setMediaType(mediaType);
-                    post.setMediaPath("uploads/posts/" + filename);
-                }
+                Path target = com.internlink.util.StorageUtil.uploadsPath(uploadFolder, filename);
+                Files.copy(media.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+                post.setMediaType(mediaType);
+                post.setMediaPath(com.internlink.util.StorageUtil.webPath(uploadFolder, filename));
             } else {
                 post.setMediaType("TEXT");
             }
 
-            postDAO.save(req.getServletContext(), post);
+            postDAO.save(post);
             resp.sendRedirect(req.getContextPath() + "/student/dashboard");
         } catch (Exception e) {
             throw new ServletException("Unable to create student post", e);

@@ -60,6 +60,7 @@ public class Company {
 
     public String getLogoPath()                     { return logoPath; }
     public void setLogoPath(String logoPath)        { this.logoPath = logoPath; }
+    public String getLogoUrl()                      { return com.internlink.util.CompanyLogoUtil.getLogoUrl(logoPath); }
 
     public boolean isVerified()                     { return isVerified; }
     public void setVerified(boolean verified)       { isVerified = verified; }

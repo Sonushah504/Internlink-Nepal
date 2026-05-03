@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Default company logo">
+  <rect width="128" height="128" rx="24" fill="#e8f1fb"/>
+  <rect x="28" y="32" width="72" height="64" rx="8" fill="#185FA5"/>
+  <rect x="40" y="44" width="12" height="12" fill="#ffffff"/>
+  <rect x="58" y="44" width="12" height="12" fill="#ffffff"/>
+  <rect x="76" y="44" width="12" height="12" fill="#ffffff"/>
+  <rect x="40" y="62" width="12" height="12" fill="#ffffff"/>
+  <rect x="58" y="62" width="12" height="12" fill="#ffffff"/>
+  <rect x="76" y="62" width="12" height="12" fill="#ffffff"/>
+  <rect x="56" y="80" width="16" height="16" fill="#ffffff"/>
+</svg>

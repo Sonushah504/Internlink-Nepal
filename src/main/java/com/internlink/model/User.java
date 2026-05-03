@@ -10,6 +10,9 @@ public class User {
     private String        email;
     private String        passwordHash;
     private String        role;          // STUDENT | COMPANY | ADMIN
+    /** LOCAL | GOOGLE | FACEBOOK */
+    private String        authProvider;
+    private String        profilePhoto;
     private boolean       isActive;
     private LocalDateTime createdAt;
 
@@ -34,6 +37,14 @@ public class User {
 
     public String getRole()                     { return role; }
     public void setRole(String role)            { this.role = role; }
+
+    public String getAuthProvider()             { return authProvider; }
+    public void setAuthProvider(String authProvider) { this.authProvider = authProvider; }
+
+    public String getProfilePhoto()             { return profilePhoto; }
+    public void setProfilePhoto(String profilePhoto) { this.profilePhoto = profilePhoto; }
+
+    public String getProfilePhotoUrl()          { return com.internlink.util.ProfilePhotoUtil.getProfilePhotoUrl(this); }
 
     public boolean isActive()                   { return isActive; }
     public void setActive(boolean active)       { isActive = active; }

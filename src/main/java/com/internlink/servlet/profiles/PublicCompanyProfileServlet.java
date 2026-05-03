@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @WebServlet("/profiles/company")
 public class PublicCompanyProfileServlet extends HttpServlet {
@@ -61,7 +60,12 @@ public class PublicCompanyProfileServlet extends HttpServlet {
     private String resolveCultureVideo(HttpServletRequest req, int companyId) {
         String[] extensions = {".mp4", ".webm", ".ogg"};
         for (String extension : extensions) {
-            Path path = Paths.get(req.getServletContext().getRealPath("/uploads/company-videos/company-" + companyId + extension));
+            Path path;
+            try {
+                path = com.internlink.util.StorageUtil.resolveUpload("uploads/company-videos/company-" + companyId + extension);
+            } catch (Exception e) {
+                return null;
+            }
             if (Files.exists(path)) {
                 return "uploads/company-videos/company-" + companyId + extension;
             }

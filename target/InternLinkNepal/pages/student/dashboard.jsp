@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <c:set var="pageTitle" value="Student Dashboard – InternLink Nepal"/>
 <jsp:include page="/components/header.jsp"/>
 
@@ -134,14 +135,7 @@
   <aside class="dash-sidebar">
     <div class="dash-sidebar-brand">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <c:choose>
-          <c:when test="${not empty profile.profilePhoto}">
-            <img src="${pageContext.request.contextPath}/${profile.profilePhoto}" alt="${profile.fullName}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--border);"/>
-          </c:when>
-          <c:otherwise>
-            <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#185FA5,#2d7dd2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;">${fn:substring(profile.fullName,0,1)}</div>
-          </c:otherwise>
-        </c:choose>
+        <img src="${pageContext.request.contextPath}/${profile.profilePhotoUrl}" alt="${profile.fullName}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--border);"/>
         <div>
           <h3>${profile.fullName}</h3>
           <p>${profile.university}</p>
@@ -150,29 +144,29 @@
     </div>
     <div class="sidebar-section-label">Main</div>
     <a href="${pageContext.request.contextPath}/student/dashboard" class="sidebar-nav-item active">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".8"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/></svg>
+      <i class="fa-solid fa-table-cells-large nav-icon"></i>
       Overview
     </a>
     <a href="${pageContext.request.contextPath}/jobs" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="5" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 5V4a3 3 0 0 1 6 0v1" stroke="currentColor" stroke-width="1.5"/></svg>
+      <i class="fa-solid fa-briefcase nav-icon"></i>
       Browse Jobs
     </a>
     <a href="${pageContext.request.contextPath}/student/applications" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <i class="fa-solid fa-file-lines nav-icon"></i>
       My Applications
     </a>
     <div class="sidebar-section-label">Profile</div>
     <a href="${pageContext.request.contextPath}/student/profile" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 16c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <i class="fa-solid fa-user nav-icon"></i>
       My Profile
     </a>
     <a href="${pageContext.request.contextPath}/student/portfolio" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><path d="M9 2L11 7H16L12 10.5L13.5 16L9 13L4.5 16L6 10.5L2 7H7L9 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <i class="fa-solid fa-star nav-icon"></i>
       Portfolio
     </a>
     <c:if test="${not empty profile}">
-      <a href="${pageContext.request.contextPath}/profiles/student?id=${profile.id}" class="sidebar-nav-item" target="_blank">
-        <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M2 17c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <a href="${pageContext.request.contextPath}/profiles/student?id=${profile.id}" class="sidebar-nav-item">
+        <i class="fa-solid fa-id-card nav-icon"></i>
         Public Profile
       </a>
     </c:if>
@@ -188,25 +182,29 @@
       <p>Here's what's happening with your job search today.</p>
     </div>
 
+    <c:if test="${param.profileSaved == '1'}">
+      <div class="alert alert-success" data-auto-dismiss style="margin-bottom:16px;">Profile details updated. Changes appear everywhere on the site.</div>
+    </c:if>
+
     <!-- Metric cards -->
     <div class="metric-cards">
       <div class="metric-card mc-blue">
-        <div class="mc-icon">&#128196;</div>
+        <div class="mc-icon"><i class="fa-solid fa-file-lines"></i></div>
         <div class="mc-label">Total Applications</div>
         <div class="mc-value">${fn:length(applications)}</div>
       </div>
       <div class="metric-card mc-orange">
-        <div class="mc-icon">&#9203;</div>
+        <div class="mc-icon"><i class="fa-solid fa-hourglass-half"></i></div>
         <div class="mc-label">Pending</div>
         <div class="mc-value">${pending}</div>
       </div>
       <div class="metric-card mc-green">
-        <div class="mc-icon">&#127942;</div>
+        <div class="mc-icon"><i class="fa-solid fa-award"></i></div>
         <div class="mc-label">Shortlisted</div>
         <div class="mc-value">${shortlisted}</div>
       </div>
       <div class="metric-card mc-green">
-        <div class="mc-icon">&#127881;</div>
+        <div class="mc-icon"><i class="fa-solid fa-circle-check"></i></div>
         <div class="mc-label">Selected</div>
         <div class="mc-value">${selected}</div>
       </div>
@@ -227,7 +225,7 @@
         </div>
         <c:if test="${profile.profileScore < 100}">
           <div style="margin-top:10px;font-size:13px;color:var(--text-secondary);">
-            &#128161; <a href="${pageContext.request.contextPath}/student/profile" style="color:var(--primary);">Complete your profile</a> to improve visibility to companies.
+            <i class="fa-solid fa-lightbulb" style="color:var(--warning);margin-right:4px;"></i><a href="${pageContext.request.contextPath}/student/profile" style="color:var(--primary);">Complete your profile</a> to improve visibility to companies.
           </div>
         </c:if>
       </div>
@@ -242,14 +240,7 @@
         <!-- Create Post Card -->
         <div class="post-create-card">
           <div class="post-create-header">
-            <c:choose>
-              <c:when test="${not empty profile.profilePhoto}">
-                <img src="${pageContext.request.contextPath}/${profile.profilePhoto}" alt="${profile.fullName}" class="post-create-avatar"/>
-              </c:when>
-              <c:otherwise>
-                <div class="post-create-avatar-fb">${fn:substring(profile.fullName,0,1)}</div>
-              </c:otherwise>
-            </c:choose>
+            <img src="${pageContext.request.contextPath}/${profile.profilePhotoUrl}" alt="${profile.fullName}" class="post-create-avatar"/>
             <textarea id="postTextArea" class="post-text-area" placeholder="Share work updates, projects, learnings, or achievements..." rows="1" onclick="expandPost()"></textarea>
           </div>
 
@@ -264,15 +255,15 @@
             <div class="post-action-btns">
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button type="button" class="post-type-btn" id="btnPhoto" onclick="triggerMediaUpload('image/*')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <i class="fa-solid fa-image"></i>
                   Photo
                 </button>
                 <button type="button" class="post-type-btn" id="btnVideo" onclick="triggerMediaUpload('video/*')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                  <i class="fa-solid fa-video"></i>
                   Video
                 </button>
                 <button type="button" class="post-type-btn" id="btnText" onclick="setTextOnly()">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                  <i class="fa-solid fa-align-left"></i>
                   Text Only
                 </button>
               </div>
@@ -333,26 +324,19 @@
             <c:forEach var="post" items="${posts}">
               <div class="post-card">
                 <div class="post-header">
-                  <c:choose>
-                    <c:when test="${not empty post.studentProfilePhoto}">
-                      <img src="${pageContext.request.contextPath}/${post.studentProfilePhoto}" alt="${post.studentName}" class="post-author-photo"/>
-                    </c:when>
-                    <c:otherwise>
-                      <div class="post-author-fb">${fn:substring(post.studentName,0,1)}</div>
-                    </c:otherwise>
-                  </c:choose>
+                  <img src="${pageContext.request.contextPath}/${post.studentProfilePhotoUrl}" alt="${post.studentName}" class="post-author-photo"/>
                   <div style="min-width:0;">
                     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                       <a href="${pageContext.request.contextPath}/profiles/student?id=${post.studentId}" class="post-author-name" style="color:var(--primary);">${post.studentName}</a>
                       <c:choose>
-                        <c:when test="${post.mediaType == 'IMAGE'}">
-                          <span class="post-type-badge" style="background:var(--primary-light);color:var(--primary);">&#128247; Photo</span>
+                        <c:when test="${post.mediaType == 'PHOTO'}">
+                          <span class="post-type-badge" style="background:var(--primary-light);color:var(--primary);"><i class="fa-solid fa-image"></i> Photo</span>
                         </c:when>
                         <c:when test="${post.mediaType == 'VIDEO'}">
-                          <span class="post-type-badge" style="background:var(--warning-light);color:var(--warning);">&#127916; Video</span>
+                          <span class="post-type-badge" style="background:var(--warning-light);color:var(--warning);"><i class="fa-solid fa-video"></i> Video</span>
                         </c:when>
                         <c:otherwise>
-                          <span class="post-type-badge" style="background:var(--gray-100);color:var(--gray-600);">&#128250; Text</span>
+                          <span class="post-type-badge" style="background:var(--gray-100);color:var(--gray-600);"><i class="fa-solid fa-align-left"></i> Text</span>
                         </c:otherwise>
                       </c:choose>
                     </div>
@@ -369,7 +353,7 @@
 
                 <c:if test="${not empty post.mediaPath}">
                   <c:choose>
-                    <c:when test="${post.mediaType == 'IMAGE'}">
+                    <c:when test="${post.mediaType == 'PHOTO'}">
                       <img src="${pageContext.request.contextPath}/${post.mediaPath}" alt="Post image" class="post-media" loading="lazy"/>
                     </c:when>
                     <c:when test="${post.mediaType == 'VIDEO'}">
@@ -385,7 +369,7 @@
           </c:when>
           <c:otherwise>
             <div style="text-align:center;padding:40px 20px;background:#fff;border:1px dashed var(--border);border-radius:16px;color:var(--text-secondary);">
-              <div style="font-size:36px;margin-bottom:12px;">&#128172;</div>
+              <div style="font-size:36px;margin-bottom:12px;"><i class="fa-regular fa-comments"></i></div>
               <div style="font-size:15px;font-weight:600;margin-bottom:6px;">No posts yet</div>
               <div style="font-size:13px;">Be the first to share your work, project, or achievement!</div>
             </div>
@@ -413,7 +397,7 @@
                       </div>
                     </div>
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                      <span style="font-size:12px;color:var(--text-secondary);">&#128205; ${job.companyCity}</span>
+                      <span style="font-size:12px;color:var(--text-secondary);"><i class="fa-solid fa-location-dot"></i> ${job.companyCity}</span>
                       <span class="badge badge-fresher" style="font-size:10px;">${job.jobType}</span>
                       <div style="margin-left:auto;">
                         <c:choose>
@@ -441,20 +425,54 @@
           </c:choose>
         </div>
 
-        <!-- Profile Summary -->
-        <div class="card">
+        <!-- Profile Summary (view until Edit details, then save updates globally) -->
+        <div class="card" id="dashProfileCard">
           <div class="card-body">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
               <h3 style="font-size:15px;font-weight:700;">Profile Summary</h3>
-              <a href="${pageContext.request.contextPath}/student/profile" class="btn btn-outline btn-sm">Edit</a>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="dashProfileEditBtn" class="btn btn-outline btn-sm" onclick="dashProfileEnterEdit()">Edit details</button>
+                <a href="${pageContext.request.contextPath}/student/profile" class="btn btn-ghost btn-sm">Full profile</a>
+              </div>
             </div>
-            <div style="display:grid;gap:10px;font-size:13px;">
-              <div><span style="color:var(--text-secondary);">University: </span><strong>${profile.university}</strong></div>
-              <div><span style="color:var(--text-secondary);">Program: </span><strong>${profile.program}</strong></div>
-              <div><span style="color:var(--text-secondary);">Semester: </span><strong>${profile.semester}</strong></div>
-              <div><span style="color:var(--text-secondary);">CGPA: </span><strong>${profile.cgpa}</strong></div>
-              <div><span style="color:var(--text-secondary);">Level: </span><span class="badge badge-${fn:toLowerCase(profile.experienceType)}">${profile.experienceType}</span></div>
+
+            <div id="dashProfileView" style="display:grid;gap:10px;font-size:13px;">
+              <div><span style="color:var(--text-secondary);">University: </span><strong id="pvUni">${profile.university}</strong></div>
+              <div><span style="color:var(--text-secondary);">Program: </span><strong id="pvProg">${profile.program}</strong></div>
+              <div><span style="color:var(--text-secondary);">Semester: </span><strong id="pvSem">${profile.semester}</strong></div>
+              <div><span style="color:var(--text-secondary);">CGPA: </span><strong id="pvCgpa">${profile.cgpa}</strong></div>
+              <div><span style="color:var(--text-secondary);">Level: </span><span id="pvExpBadge" class="badge badge-${fn:toLowerCase(profile.experienceType)}">${profile.experienceType}</span></div>
             </div>
+
+            <form id="dashProfileForm" action="${pageContext.request.contextPath}/student/profile" method="post" style="display:none;margin-top:12px;">
+              <input type="hidden" name="dashboardProfile" value="1"/>
+              <div style="display:grid;gap:10px;">
+                <label class="form-label" style="margin:0;font-size:12px;">University</label>
+                <input type="text" name="university" class="form-control form-control-sm" value="${profile.university}" required/>
+                <label class="form-label" style="margin:0;font-size:12px;">Program</label>
+                <input type="text" name="program" class="form-control form-control-sm" value="${profile.program}" required/>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div>
+                    <label class="form-label" style="margin:0;font-size:12px;">Semester</label>
+                    <input type="number" name="semester" min="1" max="12" class="form-control form-control-sm" value="${profile.semester > 0 ? profile.semester : ''}" required/>
+                  </div>
+                  <div>
+                    <label class="form-label" style="margin:0;font-size:12px;">CGPA</label>
+                    <input type="number" name="cgpa" step="0.01" min="0" max="4" class="form-control form-control-sm" value="${profile.cgpa > 0 ? profile.cgpa : ''}" required/>
+                  </div>
+                </div>
+                <label class="form-label" style="margin:0;font-size:12px;">Experience level</label>
+                <select name="experienceType" class="form-control form-control-sm" required>
+                  <option value="FRESHER" ${profile.experienceType == 'FRESHER' ? 'selected' : ''}>Fresher</option>
+                  <option value="INTERN" ${profile.experienceType == 'INTERN' ? 'selected' : ''}>Intern</option>
+                  <option value="EXPERIENCED" ${profile.experienceType == 'EXPERIENCED' ? 'selected' : ''}>Experienced</option>
+                </select>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="dashProfileCancelEdit()">Cancel</button>
+                  <button type="submit" class="btn btn-primary btn-sm">Save details</button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -466,14 +484,7 @@
               <div style="display:grid;gap:10px;">
                 <c:forEach var="person" items="${relatedProfiles}" end="4">
                   <a href="${pageContext.request.contextPath}/profiles/student?id=${person.id}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;transition:all 0.2s;text-decoration:none;color:inherit;" onmouseover="this.style.borderColor='var(--primary)';this.style.background='var(--primary-light)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='transparent'">
-                    <c:choose>
-                      <c:when test="${not empty person.profilePhoto}">
-                        <img src="${pageContext.request.contextPath}/${person.profilePhoto}" alt="${person.fullName}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border);"/>
-                      </c:when>
-                      <c:otherwise>
-                        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#185FA5,#2d7dd2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;">${fn:substring(person.fullName,0,1)}</div>
-                      </c:otherwise>
-                    </c:choose>
+                    <img src="${pageContext.request.contextPath}/${person.profilePhotoUrl}" alt="${person.fullName}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border);"/>
                     <div style="min-width:0;">
                       <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${person.fullName}</div>
                       <div style="font-size:11px;color:var(--text-secondary);">${person.program}</div>
@@ -590,6 +601,24 @@ document.addEventListener('click', function(e) {
     }
   }
 });
+
+function dashProfileEnterEdit() {
+  var v = document.getElementById('dashProfileView');
+  var f = document.getElementById('dashProfileForm');
+  var b = document.getElementById('dashProfileEditBtn');
+  if (v) v.style.display = 'none';
+  if (f) f.style.display = 'block';
+  if (b) b.style.display = 'none';
+}
+
+function dashProfileCancelEdit() {
+  var v = document.getElementById('dashProfileView');
+  var f = document.getElementById('dashProfileForm');
+  var b = document.getElementById('dashProfileEditBtn');
+  if (v) v.style.display = 'grid';
+  if (f) f.style.display = 'none';
+  if (b) b.style.display = 'inline-flex';
+}
 </script>
 
 <jsp:include page="/components/footer.jsp"/>

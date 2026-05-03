@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<c:if test="${sessionScope.userRole != 'ADMIN' and sessionScope.userRole != 'COMPANY'}">
 <footer class="footer">
   <div class="footer-grid">
     <div>
@@ -40,3 +42,9 @@
 <script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
 </body>
 </html>
+</c:if>
+<c:if test="${sessionScope.userRole == 'ADMIN' or sessionScope.userRole == 'COMPANY'}">
+<script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
+</body>
+</html>
+</c:if>

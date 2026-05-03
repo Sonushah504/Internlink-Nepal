@@ -213,7 +213,7 @@
     <div style="display:flex;gap:10px;align-items:center;">
       <a href="${pageContext.request.contextPath}/student/dashboard" class="btn btn-ghost btn-sm">Back to Dashboard</a>
       <c:if test="${not empty profile and not empty profile.fullName}">
-        <a href="${pageContext.request.contextPath}/profiles/student?id=${profile.id}" class="btn btn-outline btn-sm" target="_blank">View Public Profile</a>
+        <a href="${pageContext.request.contextPath}/profiles/student?id=${profile.id}" class="btn btn-outline btn-sm">View Public Profile</a>
       </c:if>
     </div>
   </div>
@@ -225,23 +225,13 @@
   <div style="display:grid;grid-template-columns:minmax(0,1.65fr) 340px;gap:20px;align-items:start;">
 
     <!-- Main form card -->
-    <form id="studentProfileForm" action="${pageContext.request.contextPath}/student/profile" method="post" enctype="multipart/form-data" class="card" style="overflow:visible;">
+    <form id="studentProfileForm" action="${pageContext.request.contextPath}/student/profile" method="post" enctype="multipart/form-data" class="card" style="overflow:visible;" onsubmit="var fn=document.querySelector('#studentProfileForm [name=\'fullName\']'); if(fn&amp;&amp;fn.readOnly)return false; return true;">
       <input type="file" id="profilePhotoInput" name="profilePhoto" accept="image/*" style="display:none;"/>
 
       <!-- Hero section with photo -->
       <div class="profile-hero-card">
         <div class="profile-photo-wrap">
-          <c:choose>
-            <c:when test="${not empty profile.profilePhoto}">
-              <img id="profileImagePreview" src="${pageContext.request.contextPath}/${profile.profilePhoto}" alt="Profile photo" class="profile-photo-img"/>
-            </c:when>
-            <c:otherwise>
-              <div id="profileImagePreviewFallback" class="profile-photo-fallback">
-                ${empty profile.fullName ? 'S' : fn:substring(profile.fullName,0,1)}
-              </div>
-              <img id="profileImagePreview" alt="Profile photo preview" class="profile-photo-img" style="display:none;"/>
-            </c:otherwise>
-          </c:choose>
+          <img id="profileImagePreview" src="${pageContext.request.contextPath}/${profile.profilePhotoUrl}" alt="Profile photo" class="profile-photo-img"/>
           <button type="button" class="profile-photo-upload-btn" id="photoUploadTrigger" title="Change photo">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </button>
@@ -352,11 +342,39 @@
   const editBtn = document.getElementById('editProfileBtn');
   const actionsHint = document.getElementById('actionsHint');
   const scoreTipsEl = document.getElementById('scoreTips');
+  const hasExistingProfile = ${not empty profile and not empty profile.fullName ? 'true' : 'false'};
 
   // Snapshot of initial state to detect changes
   const initialState = fields.map(f => f.value).join('||');
   let photoChanged = false;
-  let editModeActive = ${empty profile or empty profile.fullName ? 'true' : 'false'};
+  let editModeActive = !hasExistingProfile;
+  window.studentProfileEditState = {
+    enableEditMode: function() {
+      editModeActive = true;
+      updateFormState();
+    },
+    refresh: updateFormState
+  };
+
+  function applyReadOnlyView(enabled) {
+    fields.forEach(function(f) {
+      if (f.tagName === 'SELECT') {
+        f.disabled = enabled;
+      } else {
+        f.readOnly = enabled;
+      }
+    });
+    if (photoTrigger) {
+      photoTrigger.disabled = enabled;
+      photoTrigger.style.opacity = enabled ? '0.45' : '1';
+      photoTrigger.style.pointerEvents = enabled ? 'none' : 'auto';
+    }
+  }
+
+  if (hasExistingProfile) {
+    editModeActive = false;
+    applyReadOnlyView(true);
+  }
 
   // Score weights per field key
   const scoreMap = {
@@ -393,7 +411,6 @@
         const fallback = document.getElementById('profileImagePreviewFallback');
 
         imgEl.src = e.target.result;
-        imgEl.style.display = 'block';
         if (fallback) fallback.style.display = 'none';
 
         // Update hint
@@ -485,12 +502,18 @@
     const heroBadge = document.getElementById('heroBadgeExp');
     if (expField && heroBadge) heroBadge.textContent = expField.value || 'Experience Level';
 
-    // Enable / disable submit
-    const canSave = allRequiredFilled() && (editModeActive || hasChanged());
+    let canSave;
+    if (hasExistingProfile) {
+      canSave = editModeActive && hasChanged() && allRequiredFilled();
+    } else {
+      canSave = allRequiredFilled();
+    }
     submit.disabled = !canSave;
 
     if (canSave) {
-      if (actionsHint) actionsHint.textContent = 'Ready to save! Click "Save Changes" to update your profile.';
+      if (actionsHint) actionsHint.textContent = 'Ready to save! Click "Save Changes" to update your profile everywhere.';
+    } else if (!editModeActive && hasExistingProfile) {
+      if (actionsHint) actionsHint.textContent = 'Click "Edit Details" to change your profile, then save.';
     } else if (!allRequiredFilled()) {
       if (actionsHint) actionsHint.textContent = 'Fill all required fields (marked with *) to save.';
     } else {
@@ -507,24 +530,34 @@
   // Initial state
   updateFormState();
 
-  // If existing profile, fields are read-only-ish until "Edit Details" is clicked
-  // (they remain enabled so user can tab through, but save is only unlocked on change)
-  // We highlight that by calling updateFormState
 })();
 
 function enableEditMode() {
+  if (window.studentProfileEditState) {
+    window.studentProfileEditState.enableEditMode();
+  }
   var btn = document.getElementById('editProfileBtn');
   var hint = document.getElementById('actionsHint');
   if (btn) btn.style.display = 'none';
-  if (hint) hint.textContent = 'Edit the fields above and click "Save Changes" when done.';
+  if (hint) hint.textContent = 'Edit the fields above and click "Save Changes" to update your profile everywhere.';
   var form = document.getElementById('studentProfileForm');
   if (form) {
     var fields = form.querySelectorAll('[data-profile-field]');
-    fields.forEach(function(f){ f.readOnly = false; f.classList.remove('readonly'); });
+    fields.forEach(function(f) {
+      f.readOnly = false;
+      f.disabled = false;
+      f.classList.remove('readonly');
+    });
     var photoTrigger = document.getElementById('photoUploadTrigger');
-    if (photoTrigger) photoTrigger.disabled = false;
-    // ensure submit enabled after edits
-    fields[0].focus();
+    if (photoTrigger) {
+      photoTrigger.disabled = false;
+      photoTrigger.style.opacity = '1';
+      photoTrigger.style.pointerEvents = 'auto';
+    }
+    if (fields.length) fields[0].focus();
+    if (window.studentProfileEditState && window.studentProfileEditState.refresh) {
+      window.studentProfileEditState.refresh();
+    }
   }
 }
 </script>

@@ -10,7 +10,7 @@ import java.util.List;
 public class ApplicationDAO {
     public List<Application> findByCompanyId(int companyId) throws SQLException {
         String sql = """
-            SELECT a.*, sp.full_name, sp.cgpa, sp.skills, sp.experience_type, sp.cv_path, sp.profile_photo,
+            SELECT a.*, sp.full_name, sp.cgpa, sp.skills, sp.experience_type, sp.cv_path, %s AS profile_photo,
                    u.email AS student_email, jp.title AS job_title
             FROM applications a
             JOIN student_profiles sp ON sp.id = a.student_id
@@ -18,13 +18,13 @@ public class ApplicationDAO {
             JOIN job_postings jp ON jp.id = a.job_id
             WHERE jp.company_id = ?
             ORDER BY a.applied_at DESC
-            """;
+            """.formatted(resolvedProfilePhotoSql());
         return fetchList(sql, companyId);
     }
 
     public List<Application> findByJobId(int jobId) throws SQLException {
         String sql = """
-            SELECT a.*, sp.full_name, sp.cgpa, sp.skills, sp.experience_type, sp.cv_path, sp.profile_photo,
+            SELECT a.*, sp.full_name, sp.cgpa, sp.skills, sp.experience_type, sp.cv_path, %s AS profile_photo,
                    u.email AS student_email, jp.title AS job_title
             FROM applications a
             JOIN student_profiles sp ON sp.id = a.student_id
@@ -32,13 +32,13 @@ public class ApplicationDAO {
             JOIN job_postings jp ON jp.id = a.job_id
             WHERE a.job_id = ?
             ORDER BY a.applied_at DESC
-            """;
+            """.formatted(resolvedProfilePhotoSql());
         return fetchList(sql, jobId);
     }
 
     public List<Application> findByStudentId(int studentId) throws SQLException {
         String sql = """
-            SELECT a.*, sp.full_name, sp.cgpa, sp.skills, sp.experience_type, sp.cv_path, sp.profile_photo,
+            SELECT a.*, sp.full_name, sp.cgpa, sp.skills, sp.experience_type, sp.cv_path, %s AS profile_photo,
                    u.email AS student_email, jp.title AS job_title, c.company_name
             FROM applications a
             JOIN student_profiles sp ON sp.id = a.student_id
@@ -47,7 +47,7 @@ public class ApplicationDAO {
             JOIN companies c ON c.id = jp.company_id
             WHERE a.student_id = ?
             ORDER BY a.applied_at DESC
-            """;
+            """.formatted(resolvedProfilePhotoSql());
         return fetchList(sql, studentId);
     }
 
@@ -142,5 +142,16 @@ public class ApplicationDAO {
         a.setJobTitle(rs.getString("job_title"));
         try { a.setCompanyName(rs.getString("company_name")); } catch (Exception ignored) {}
         return a;
+    }
+
+    private String resolvedProfilePhotoSql() throws SQLException {
+        return hasUserProfilePhotoColumn() ? "COALESCE(u.profile_photo, sp.profile_photo)" : "sp.profile_photo";
+    }
+
+    private boolean hasUserProfilePhotoColumn() throws SQLException {
+        try (Connection conn = DBConnection.getConnection();
+             ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), null, "users", "profile_photo")) {
+            return rs.next();
+        }
     }
 }

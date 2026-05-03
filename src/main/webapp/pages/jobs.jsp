@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <c:set var="pageTitle" value="Browse Jobs - InternLink Nepal"/>
 <jsp:include page="/components/header.jsp"/>
 
@@ -38,7 +39,7 @@
             <div class="card job-card" onclick="location.href='${pageContext.request.contextPath}/jobs?id=${job.id}'">
               <div class="card-body">
                 <div class="job-card-header">
-                  <div class="company-logo-wrap">${fn:substring(job.companyName,0,2)}</div>
+                  <div class="company-logo-wrap"><img src="${pageContext.request.contextPath}/${job.companyLogoUrl}" alt="${job.companyName}" class="company-logo-img"/></div>
                   <span class="badge badge-intern">${job.jobType}</span>
                 </div>
                 <div class="job-title">${job.title}</div>
@@ -49,7 +50,7 @@
                   </c:forTokens>
                 </div>
                 <div class="job-footer">
-                  <span class="job-location">&#128205; ${job.companyCity}</span>
+                  <span class="job-location"><i class="fa-solid fa-location-dot"></i> ${job.companyCity}</span>
                   <span class="badge badge-${fn:toLowerCase(job.experienceRequired == 'ANY' ? 'fresher' : job.experienceRequired)}">
                     ${job.experienceRequired == 'ANY' ? 'Open to All' : job.experienceRequired}
                   </span>

@@ -57,7 +57,7 @@ public class CompanyDAO {
     }
 
     public int create(Company co) throws SQLException {
-        String sql = "INSERT INTO companies (user_id, company_name, industry, description, website, phone, address, city, latitude, longitude, employee_count, founded_year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO companies (user_id, company_name, industry, description, website, phone, address, city, latitude, longitude, logo_path, employee_count, founded_year) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, co.getUserId());
@@ -70,8 +70,9 @@ public class CompanyDAO {
             ps.setString(8, co.getCity());
             ps.setDouble(9, co.getLatitude());
             ps.setDouble(10, co.getLongitude());
-            ps.setString(11, co.getEmployeeCount());
-            ps.setInt(12, co.getFoundedYear());
+            ps.setString(11, co.getLogoPath());
+            ps.setString(12, co.getEmployeeCount());
+            ps.setInt(13, co.getFoundedYear());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) return rs.getInt(1);
@@ -81,7 +82,7 @@ public class CompanyDAO {
     }
 
     public void update(Company co) throws SQLException {
-        String sql = "UPDATE companies SET company_name=?, industry=?, description=?, website=?, phone=?, address=?, city=?, latitude=?, longitude=?, employee_count=?, founded_year=? WHERE id=?";
+        String sql = "UPDATE companies SET company_name=?, industry=?, description=?, website=?, phone=?, address=?, city=?, latitude=?, longitude=?, logo_path=?, employee_count=?, founded_year=? WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, co.getCompanyName());
@@ -93,9 +94,10 @@ public class CompanyDAO {
             ps.setString(7, co.getCity());
             ps.setDouble(8, co.getLatitude());
             ps.setDouble(9, co.getLongitude());
-            ps.setString(10, co.getEmployeeCount());
-            ps.setInt(11, co.getFoundedYear());
-            ps.setInt(12, co.getId());
+            ps.setString(10, co.getLogoPath());
+            ps.setString(11, co.getEmployeeCount());
+            ps.setInt(12, co.getFoundedYear());
+            ps.setInt(13, co.getId());
             ps.executeUpdate();
         }
     }

@@ -65,6 +65,7 @@ public class StudentProfile {
 
     public String getProfilePhoto()                 { return profilePhoto; }
     public void setProfilePhoto(String p)           { this.profilePhoto = p; }
+    public String getProfilePhotoUrl()              { return com.internlink.util.ProfilePhotoUtil.getProfilePhotoUrl(profilePhoto); }
 
     public String getExperienceType()               { return experienceType; }
     public void setExperienceType(String t)         { this.experienceType = t; }

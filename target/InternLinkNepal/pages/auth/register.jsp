@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Create Account – InternLink Nepal"/>
-<jsp:include page="/components/header.jsp"/>
+<jsp:include page="/components/auth-head.jsp"/>
 
-<div style="min-height:calc(100vh - 60px);background:var(--gray-50);padding:40px 16px;">
+<div style="min-height:100vh;background:var(--gray-50);padding:40px 16px;">
   <div style="max-width:620px;margin:0 auto;">
 
     <div style="text-align:center;margin-bottom:28px;">
@@ -12,18 +12,18 @@
     </div>
 
     <c:if test="${not empty error}">
-      <div class="alert alert-error" data-auto-dismiss>&#9888; ${error}</div>
+      <div class="alert alert-error" data-auto-dismiss><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>${error}</div>
     </c:if>
 
     <!-- Role Tabs -->
-    <div style="display:flex;border-radius:var(--radius-md);overflow:hidden;border:1.5px solid var(--border);margin-bottom:24px;background:#fff;">
-      <button onclick="switchRole('STUDENT')" id="tab-STUDENT"
-        style="flex:1;padding:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;">
-        &#127891; I am a Student
+    <div class="reg-role-tabs" style="display:flex;border-radius:var(--radius-md);overflow:hidden;border:1.5px solid var(--border);margin-bottom:24px;background:#fff;">
+      <button type="button" onclick="switchRole('STUDENT')" id="tab-STUDENT"
+        style="flex:1;padding:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <i class="fa-solid fa-user-graduate"></i> I am a Student
       </button>
-      <button onclick="switchRole('COMPANY')" id="tab-COMPANY"
-        style="flex:1;padding:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;background:#fff;color:var(--text-secondary);">
-        &#127970; I am a Company
+      <button type="button" onclick="switchRole('COMPANY')" id="tab-COMPANY"
+        style="flex:1;padding:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;background:#fff;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;gap:8px;">
+        <i class="fa-solid fa-building"></i> I am a Company
       </button>
     </div>
 
@@ -147,7 +147,7 @@
                 <input type="text" name="longitude" id="longitude" class="form-control" placeholder="85.3240"/>
               </div>
             </div>
-            <button type="button" id="geocodeBtn" class="btn btn-ghost btn-sm" style="margin-bottom:16px;">&#128205; Auto-detect from address</button>
+            <button type="button" id="geocodeBtn" class="btn btn-ghost btn-sm" style="margin-bottom:16px;"><i class="fa-solid fa-location-dot" style="margin-right:6px;"></i>Auto-detect from address</button>
             <div class="form-group">
               <label class="form-label">Company Description</label>
               <textarea name="description" class="form-control" rows="3" placeholder="What does your company do?"></textarea>
@@ -181,4 +181,4 @@ const urlRole = new URLSearchParams(location.search).get('role');
 if (urlRole === 'COMPANY') switchRole('COMPANY');
 </script>
 
-<jsp:include page="/components/footer.jsp"/>
+<jsp:include page="/components/auth-tail.jsp"/>

@@ -30,11 +30,33 @@
   width: 90px; height: 90px;
   border-radius: 22px;
   background: rgba(255,255,255,0.18);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px; font-weight: 800; color: #fff;
   border: 3px solid rgba(255,255,255,0.3);
   flex-shrink: 0;
+  object-fit: cover;
+  overflow: hidden;
 }
+.company-logo-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.company-logo-upload-btn {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: all 0.2s;
+  color: var(--primary);
+}
+.company-logo-upload-btn:hover { transform: scale(1.1); }
 .company-hero-text { flex: 1; min-width: 240px; }
 .company-hero-name { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 6px; }
 .company-hero-sub { opacity: 0.85; font-size: 14px; margin-bottom: 12px; }
@@ -84,6 +106,18 @@
 .video-upload-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
 .video-upload-sub { font-size: 13px; color: var(--text-secondary); }
 .video-current-preview { width: 100%; border-radius: 12px; background: #000; max-height: 240px; }
+.company-edit-locked .profile-input,
+.company-edit-locked textarea.profile-input {
+  pointer-events: none;
+  background: var(--gray-50);
+  color: var(--text-secondary);
+}
+.company-edit-locked #companyLogoTrigger,
+.company-edit-locked .company-logo-upload-btn,
+.company-edit-locked .video-upload-area {
+  pointer-events: none;
+  opacity: 0.65;
+}
 </style>
 
 <div class="company-profile-page">
@@ -93,9 +127,8 @@
       <p style="font-size:13px;color:var(--text-secondary);">Keep your organization details up to date for students and admin review.</p>
     </div>
     <div style="display:flex;gap:10px;">
-      <a href="${pageContext.request.contextPath}/company/dashboard" class="btn btn-ghost btn-sm">Back to Dashboard</a>
       <c:if test="${not empty company and not empty company.companyName}">
-        <a href="${pageContext.request.contextPath}/profiles/company?id=${company.id}" class="btn btn-outline btn-sm" target="_blank">View Public Profile</a>
+        <a href="${pageContext.request.contextPath}/profiles/company?id=${company.id}" class="btn btn-outline btn-sm">View Public Profile</a>
       </c:if>
     </div>
   </div>
@@ -104,10 +137,15 @@
     <div class="alert alert-success" data-auto-dismiss style="margin-bottom:16px;">Company profile saved successfully.</div>
   </c:if>
 
+  <input type="file" id="companyLogoInput" name="companyLogo" accept="image/*" form="companyProfileForm" style="display:none;"/>
+
   <!-- Hero Banner Preview -->
   <div class="company-hero-banner">
-    <div class="company-logo-circle" id="heroLogoCircle">
-      ${empty company.companyName ? 'C' : company.companyName.substring(0,1)}
+    <div class="company-logo-wrap">
+      <img class="company-logo-circle" id="heroLogoCircle" src="${pageContext.request.contextPath}/${company.logoUrl}" alt="Company logo"/>
+      <button type="button" class="company-logo-upload-btn" id="companyLogoTrigger" title="Change logo">
+        <i class="fa-solid fa-camera"></i>
+      </button>
     </div>
     <div class="company-hero-text">
       <div class="company-hero-name" id="heroCompanyName">${empty company.companyName ? 'Company Name' : company.companyName}</div>
@@ -120,13 +158,18 @@
     </div>
   </div>
 
-  <form action="${pageContext.request.contextPath}/company/profile" method="post" enctype="multipart/form-data" id="companyProfileForm">
+  <form action="${pageContext.request.contextPath}/company/profile" method="post" enctype="multipart/form-data" id="companyProfileForm" class="${not empty company and not empty company.companyName ? 'company-edit-locked' : ''}">
 
     <!-- Basic Info -->
     <div class="section-card">
       <div class="section-card-header">
         <h3>Basic Information</h3>
-        <span class="badge ${company.verified ? 'badge-verified' : 'badge-pending-co'}">${company.verified ? 'Verified Company' : 'Pending Verification'}</span>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="badge ${company.verified ? 'badge-verified' : 'badge-pending-co'}">${company.verified ? 'Verified Company' : 'Pending Verification'}</span>
+          <c:if test="${not empty company and not empty company.companyName}">
+            <button type="button" id="editCompanyBtn" class="btn btn-outline btn-sm" onclick="enableCompanyEdit()">Edit Details</button>
+          </c:if>
+        </div>
       </div>
       <div class="section-card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div>
@@ -232,12 +275,19 @@
     <!-- Save Action -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 0;flex-wrap:wrap;gap:12px;">
       <div style="font-size:13px;color:var(--text-secondary);">All changes are saved immediately when you click Save.</div>
-      <button type="submit" class="btn btn-primary">Save Company Profile</button>
+      <button type="submit" id="companyProfileSubmit" class="btn btn-primary">Save Company Profile</button>
     </div>
   </form>
 </div>
 
 <script>
+function enableCompanyEdit() {
+  var form = document.getElementById('companyProfileForm');
+  var editBtn = document.getElementById('editCompanyBtn');
+  if (form) form.classList.remove('company-edit-locked');
+  if (editBtn) editBtn.style.display = 'none';
+}
+
 // Live preview of company name/industry/city in hero
 (function() {
   function bind(inputId, updateFn) {
@@ -250,9 +300,7 @@
   bind('inputCompanyName', function() {
     var v = this.value;
     var heroName = document.getElementById('heroCompanyName');
-    var heroLogo = document.getElementById('heroLogoCircle');
     if (heroName) heroName.textContent = v || 'Company Name';
-    if (heroLogo) heroLogo.textContent = v ? v[0].toUpperCase() : 'C';
   });
   bind('inputIndustry', function() {
     updateSub();
@@ -276,6 +324,28 @@
       heroSub.textContent = (ind && ind.value ? ind.value : 'Industry') + ' \u2022 ' + (city && city.value ? city.value : 'City');
     }
   }
+})();
+
+(function() {
+  var trigger = document.getElementById('companyLogoTrigger');
+  var input = document.getElementById('companyLogoInput');
+  var heroPreview = document.getElementById('heroLogoCircle');
+  if (!trigger || !input || !heroPreview) return;
+
+  trigger.addEventListener('click', function() {
+    input.click();
+  });
+
+  input.addEventListener('change', function() {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      heroPreview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    enableCompanyEdit();
+  });
 })();
 
 // Video file input handler

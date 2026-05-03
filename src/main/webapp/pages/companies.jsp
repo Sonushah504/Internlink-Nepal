@@ -17,7 +17,7 @@
       <div class="card">
         <div class="card-body">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-            <div class="company-logo-wrap">${fn:substring(co.companyName,0,2)}</div>
+            <div class="company-logo-wrap"><img src="${pageContext.request.contextPath}/${co.logoUrl}" alt="${co.companyName}" class="company-logo-img"/></div>
             <div>
               <div style="font-size:17px;font-weight:700;">${co.companyName}</div>
               <div style="color:var(--text-secondary);font-size:13px;">${co.industry} • ${co.city}</div>
@@ -34,9 +34,7 @@
             <div><strong>Founded:</strong> ${co.foundedYear}</div>
             <div><strong>Team size:</strong> ${co.employeeCount}</div>
           </div>
-          <c:if test="${not empty co.website}">
-            <a href="${co.website}" class="btn btn-outline" style="margin-top:16px;" target="_blank" rel="noopener">Visit Website</a>
-          </c:if>
+          <a href="${pageContext.request.contextPath}/profiles/company?id=${co.id}" class="btn btn-outline" style="margin-top:16px;">View Profile</a>
         </div>
       </div>
     </c:forEach>

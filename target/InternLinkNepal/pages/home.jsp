@@ -2,32 +2,36 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <c:set var="pageTitle" value="InternLink Nepal – Find Internships & Jobs in Nepal"/>
 <jsp:include page="/components/header.jsp"/>
 
-<!-- ── Hero ─────────────────────────────────────────────────── -->
 <section class="hero">
-  <div class="hero-badge"><span class="dot"></span> Nepal's #1 Internship Platform</div>
-  <h1>Find your first <span>internship</span> or fresher job in Nepal</h1>
-  <p>A single, verified platform connecting bachelor students with trusted companies — no more scattered Facebook groups or missed opportunities.</p>
-  <div class="hero-actions">
-    <a href="${pageContext.request.contextPath}/register?role=STUDENT" class="btn btn-primary btn-lg">I am a Student</a>
-    <a href="${pageContext.request.contextPath}/register?role=COMPANY" class="btn btn-outline btn-lg">I am a Company</a>
+  <div class="hero-container">
+
+    <!-- LEFT CONTENT -->
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="dot"></span> Nepal's #1 Internship Platform
+      </div>
+
+      <h1>
+        Find your first <span>internship</span> or fresher job in Nepal
+      </h1>
+
+      <p>
+        A single, verified platform connecting bachelor students with trusted companies —
+        no more scattered Facebook groups or missed opportunities.
+      </p>
+    </div>
+
+    <!-- RIGHT IMAGE -->
+    <div class="hero-right">
+      <img src="${pageContext.request.contextPath}/assets/images/hero_job.png" alt="Internship Illustration">
+    </div>
+
   </div>
-  <!-- Search -->
-  <form action="${pageContext.request.contextPath}/jobs" method="get" class="search-bar" style="max-width:600px;margin:36px auto 0;">
-    <input type="text" name="q" placeholder="Search internships, skills, or companies…"/>
-    <div class="search-divider"></div>
-    <select name="type" style="border:none;padding:14px 16px;font-size:14px;outline:none;background:transparent;">
-      <option value="">All Types</option>
-      <option value="INTERNSHIP">Internship</option>
-      <option value="FULL_TIME">Full Time</option>
-      <option value="PART_TIME">Part Time</option>
-      <option value="REMOTE">Remote</option>
-    </select>
-    <button type="submit">Search</button>
-  </form>
 </section>
 
 <!-- ── Carousel ──────────────────────────────────────────────── -->
@@ -188,7 +192,7 @@
           <div class="card job-card" onclick="location.href='${pageContext.request.contextPath}/jobs?id=${job.id}'">
             <div class="card-body">
               <div class="job-card-header">
-                <div class="company-logo-wrap">${fn:substring(job.companyName,0,2)}</div>
+                  <div class="company-logo-wrap"><img src="${pageContext.request.contextPath}/${job.companyLogoUrl}" alt="${job.companyName}" class="company-logo-img"/></div>
                 <span class="badge badge-${fn:toLowerCase(job.experienceRequired == 'ANY' ? 'fresher' : fn:toLowerCase(job.experienceRequired))}">
                   ${job.experienceRequired == 'ANY' ? 'Open to All' : job.experienceRequired}
                 </span>
@@ -201,7 +205,7 @@
                 </c:forTokens>
               </div>
               <div class="job-footer">
-                <span class="job-location">&#128205; ${job.companyCity}</span>
+                <span class="job-location"><i class="fa-solid fa-location-dot"></i> ${job.companyCity}</span>
                 <span class="badge badge-intern">${job.jobType}</span>
               </div>
             </div>
@@ -220,7 +224,7 @@
               <div class="job-title">Frontend Developer Intern</div>
               <div class="job-company">Leapfrog Technology</div>
               <div class="job-tags"><span class="tag">React</span><span class="tag">CSS</span></div>
-              <div class="job-footer"><span class="job-location">&#128205; Lalitpur</span><span class="badge badge-intern">INTERNSHIP</span></div>
+              <div class="job-footer"><span class="job-location"><i class="fa-solid fa-location-dot"></i> Lalitpur</span><span class="badge badge-intern">INTERNSHIP</span></div>
             </div>
           </div>
         </c:forEach>
@@ -250,7 +254,7 @@
             <div class="card" style="cursor:pointer;" onclick="panMap(${co.latitude},${co.longitude},'${co.companyName}')">
               <div class="card-body" style="padding:14px;">
                 <div style="display:flex;align-items:center;gap:10px;">
-                  <div class="company-logo-wrap" style="width:38px;height:38px;font-size:13px;">${fn:substring(co.companyName,0,2)}</div>
+                  <div class="company-logo-wrap" style="width:38px;height:38px;font-size:13px;"><img src="${pageContext.request.contextPath}/${co.logoUrl}" alt="${co.companyName}" class="company-logo-img"/></div>
                   <div>
                     <div style="font-size:14px;font-weight:600;">${co.companyName}</div>
                     <div style="font-size:12px;color:var(--text-secondary);">${co.city} &bull; ${co.industry}</div>
@@ -273,56 +277,6 @@
           </c:forEach>
         </c:otherwise>
       </c:choose>
-    </div>
-  </div>
-</section>
-
-<!-- ── Role Cards ─────────────────────────────────────────────── -->
-<section class="section">
-  <div class="section-header">
-    <div>
-      <h2 class="section-title">Built for everyone in the journey</h2>
-    </div>
-  </div>
-  <div class="grid-3">
-    <div class="card" style="text-align:center;padding:32px 24px;">
-      <div style="width:56px;height:56px;background:var(--primary-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;">&#127891;</div>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:10px;">Students</h3>
-      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">Build your profile, upload your CV, showcase projects, and apply to verified opportunities in one click.</p>
-      <ul style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Smart job recommendations</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Portfolio &amp; project showcase</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Real-time application tracking</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Fresher-only job filter</li>
-      </ul>
-      <a href="${pageContext.request.contextPath}/register?role=STUDENT" class="btn btn-primary btn-block">Join as Student</a>
-    </div>
-
-    <div class="card" style="text-align:center;padding:32px 24px;border-color:var(--primary);box-shadow:0 0 0 3px rgba(24,95,165,.1);">
-      <div style="background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;display:inline-block;margin-bottom:12px;">MOST POPULAR</div>
-      <div style="width:56px;height:56px;background:#E6F1FB;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;">&#127970;</div>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:10px;">Companies</h3>
-      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">Post openings, receive pre-screened CVs, filter by CGPA or skill, and shortlist the best candidates.</p>
-      <ul style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Verified company badge</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Automatic eligibility filter</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Bulk CV download</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Application status management</li>
-      </ul>
-      <a href="${pageContext.request.contextPath}/register?role=COMPANY" class="btn btn-primary btn-block">Register Company</a>
-    </div>
-
-    <div class="card" style="text-align:center;padding:32px 24px;">
-      <div style="width:56px;height:56px;background:var(--warning-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;">&#9733;</div>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:10px;">Admin</h3>
-      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">Verify companies and job posts, manage all users, and track platform-wide placement analytics.</p>
-      <ul style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Full CRUD control</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Company verification workflow</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Analytics and reports</li>
-        <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;"><span style="color:var(--success);">&#10003;</span> Broadcast notifications</li>
-      </ul>
-      <a href="${pageContext.request.contextPath}/login" class="btn btn-ghost btn-block">Admin Login</a>
     </div>
   </div>
 </section>

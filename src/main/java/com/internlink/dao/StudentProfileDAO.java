@@ -11,7 +11,7 @@ import java.util.List;
 public class StudentProfileDAO {
 
     public StudentProfile findByUserId(int userId) throws SQLException {
-        String sql = "SELECT sp.*, u.email FROM student_profiles sp JOIN users u ON u.id = sp.user_id WHERE sp.user_id = ?";
+        String sql = "SELECT sp.*, u.email, " + resolvedProfilePhotoSql() + " AS resolved_profile_photo FROM student_profiles sp JOIN users u ON u.id = sp.user_id WHERE sp.user_id = ?";
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -23,7 +23,7 @@ public class StudentProfileDAO {
     }
 
     public StudentProfile findById(int id) throws SQLException {
-        String sql = "SELECT sp.*, u.email FROM student_profiles sp JOIN users u ON u.id = sp.user_id WHERE sp.id = ?";
+        String sql = "SELECT sp.*, u.email, " + resolvedProfilePhotoSql() + " AS resolved_profile_photo FROM student_profiles sp JOIN users u ON u.id = sp.user_id WHERE sp.id = ?";
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -35,7 +35,7 @@ public class StudentProfileDAO {
     }
 
     public List<StudentProfile> findAll() throws SQLException {
-        String sql = "SELECT sp.*, u.email FROM student_profiles sp JOIN users u ON u.id = sp.user_id ORDER BY sp.full_name";
+        String sql = "SELECT sp.*, u.email, " + resolvedProfilePhotoSql() + " AS resolved_profile_photo FROM student_profiles sp JOIN users u ON u.id = sp.user_id ORDER BY sp.full_name";
         List<StudentProfile> list = new ArrayList<>();
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
@@ -46,7 +46,7 @@ public class StudentProfileDAO {
     }
 
     public List<StudentProfile> findByExperienceType(String type) throws SQLException {
-        String sql = "SELECT sp.*, u.email FROM student_profiles sp JOIN users u ON u.id = sp.user_id WHERE sp.experience_type = ? ORDER BY sp.full_name";
+        String sql = "SELECT sp.*, u.email, " + resolvedProfilePhotoSql() + " AS resolved_profile_photo FROM student_profiles sp JOIN users u ON u.id = sp.user_id WHERE sp.experience_type = ? ORDER BY sp.full_name";
         List<StudentProfile> list = new ArrayList<>();
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -60,7 +60,7 @@ public class StudentProfileDAO {
 
     public List<StudentProfile> findRelatedProfiles(int currentUserId, String program, String university, String experienceType, int limit) throws SQLException {
         String sql = """
-            SELECT sp.*, u.email FROM student_profiles sp
+            SELECT sp.*, u.email, %s AS resolved_profile_photo FROM student_profiles sp
             JOIN users u ON u.id = sp.user_id
             WHERE sp.user_id <> ?
               AND (
@@ -70,7 +70,7 @@ public class StudentProfileDAO {
               )
             ORDER BY sp.profile_score DESC, sp.full_name
             LIMIT ?
-            """;
+            """.formatted(resolvedProfilePhotoSql());
         List<StudentProfile> list = new ArrayList<>();
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -163,11 +163,22 @@ public class StudentProfileDAO {
         sp.setGithubUrl(rs.getString("github_url"));
         sp.setLinkedinUrl(rs.getString("linkedin_url"));
         sp.setCvPath(rs.getString("cv_path"));
-        sp.setProfilePhoto(rs.getString("profile_photo"));
+        sp.setProfilePhoto(rs.getString("resolved_profile_photo"));
         sp.setExperienceType(rs.getString("experience_type"));
         sp.setProfileScore(rs.getInt("profile_score"));
         sp.setBio(rs.getString("bio"));
         sp.setEmail(rs.getString("email"));
         return sp;
+    }
+
+    private String resolvedProfilePhotoSql() throws SQLException {
+        return hasUserProfilePhotoColumn() ? "COALESCE(u.profile_photo, sp.profile_photo)" : "sp.profile_photo";
+    }
+
+    private boolean hasUserProfilePhotoColumn() throws SQLException {
+        try (Connection c = DBConnection.getConnection();
+             ResultSet rs = c.getMetaData().getColumns(c.getCatalog(), null, "users", "profile_photo")) {
+            return rs.next();
+        }
     }
 }

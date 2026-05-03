@@ -75,6 +75,7 @@ public class JobPosting {
 
     public String getCompanyLogo()                  { return companyLogo; }
     public void setCompanyLogo(String l)            { this.companyLogo = l; }
+    public String getCompanyLogoUrl()               { return com.internlink.util.CompanyLogoUtil.getLogoUrl(companyLogo); }
 
     public String getCompanyCity()                  { return companyCity; }
     public void setCompanyCity(String c)            { this.companyCity = c; }

@@ -3,13 +3,26 @@ USE internlink_nepal;
 
 
 CREATE TABLE IF NOT EXISTS users (
-    id            INT AUTO_INCREMENT PRIMARY KEY,
-    email         VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    role          ENUM('STUDENT','COMPANY','ADMIN') NOT NULL DEFAULT 'STUDENT',
-    is_active     TINYINT(1) NOT NULL DEFAULT 1,
-    created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    email           VARCHAR(255) NOT NULL UNIQUE,
+    password_hash   VARCHAR(255) NULL,
+    role            ENUM('STUDENT','COMPANY','ADMIN') NOT NULL DEFAULT 'STUDENT',
+    auth_provider   ENUM('LOCAL','GOOGLE','FACEBOOK') NOT NULL DEFAULT 'LOCAL',
+    profile_photo   VARCHAR(500),
+    is_active       TINYINT(1) NOT NULL DEFAULT 1,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_otps (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT NOT NULL,
+    otp_code    VARCHAR(12) NOT NULL,
+    expires_at  DATETIME NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_reset_user (user_id),
+    INDEX idx_reset_expires (expires_at)
 );
 
 
@@ -115,6 +128,16 @@ CREATE TABLE IF NOT EXISTS notifications (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS user_posts (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id    INT NOT NULL,
+    file_type  ENUM('TEXT','PHOTO','VIDEO') NOT NULL DEFAULT 'TEXT',
+    file_path  VARCHAR(500),
+    caption    TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 
 -- Admin user (password: Admin@123)
 INSERT INTO users (email, password_hash, role) VALUES
@@ -171,3 +194,26 @@ INSERT INTO portfolios (student_id, title, description, tech_stack, github_url) 
 (3, 'Student Grade Predictor', 'ML model to predict student grades based on habits.', 'Python,Scikit-learn,Flask,Pandas', 'github.com/harithapa/predictor'),
 (4, 'Fitness Tracker App', 'Android app to log daily workouts and calories.', 'Android,Java,Firebase,Room DB', 'github.com/gitapoudel/fitness'),
 (5, 'Real-time Chat App', 'Socket.io chat app with rooms and DMs.', 'Node.js,Socket.io,React,MongoDB', 'github.com/bishalrai/chatapp');
+
+
+-- =============================================================================
+-- MIGRATION: existing databases created before OAuth / nullable passwords
+-- Run these statements ONCE on an old database (skip if you just applied the
+-- CREATE TABLE users / password_reset_otps definitions above on a fresh install).
+-- MySQL will error if a column already exists — ignore or run selectively.
+-- =============================================================================
+
+-- ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(255) NULL;
+
+-- ALTER TABLE users ADD COLUMN auth_provider ENUM('LOCAL','GOOGLE','FACEBOOK') NOT NULL DEFAULT 'LOCAL';
+
+-- CREATE TABLE IF NOT EXISTS password_reset_otps (
+--     id          INT AUTO_INCREMENT PRIMARY KEY,
+--     user_id     INT NOT NULL,
+--     otp_code    VARCHAR(12) NOT NULL,
+--     expires_at  DATETIME NOT NULL,
+--     created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+--     INDEX idx_reset_user (user_id),
+--     INDEX idx_reset_expires (expires_at)
+-- );

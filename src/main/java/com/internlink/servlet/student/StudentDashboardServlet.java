@@ -55,7 +55,7 @@ public class StudentDashboardServlet extends HttpServlet {
             req.setAttribute("shortlisted",  shortlisted);
             req.setAttribute("selected",     selected);
             req.setAttribute("relatedProfiles", studentProfileDAO.findRelatedProfiles(userId, profile.getProgram(), profile.getUniversity(), profile.getExperienceType(), 6));
-            req.setAttribute("posts", postDAO.findAll(getServletContext()));
+            req.setAttribute("posts", postDAO.findAll());
 
             req.getRequestDispatcher("/pages/student/dashboard.jsp").forward(req, resp);
         } catch (Exception e) {

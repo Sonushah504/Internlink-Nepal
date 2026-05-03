@@ -70,6 +70,7 @@ public class Application {
 
     public String getStudentProfilePhoto()              { return studentProfilePhoto; }
     public void setStudentProfilePhoto(String p)        { this.studentProfilePhoto = p; }
+    public String getStudentProfilePhotoUrl()           { return com.internlink.util.ProfilePhotoUtil.getProfilePhotoUrl(studentProfilePhoto); }
 
     public String getJobTitle()                         { return jobTitle; }
     public void setJobTitle(String jobTitle)            { this.jobTitle = jobTitle; }

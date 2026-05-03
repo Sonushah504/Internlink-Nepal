@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css"/>
   <link rel="icon" href="${pageContext.request.contextPath}/assets/images/favicon.svg" type="image/svg+xml"/>
 </head>
@@ -16,6 +18,20 @@
 
 <%
   Integer _uid = (Integer) session.getAttribute("userId");
+  String _uri = request.getRequestURI();
+  String _ctx = request.getContextPath();
+  String _pathAfterCtx = "";
+  if (_ctx != null && !_ctx.isEmpty() && _uri.startsWith(_ctx)) {
+      _pathAfterCtx = _uri.substring(_ctx.length());
+  } else {
+      _pathAfterCtx = _uri;
+  }
+  if (_pathAfterCtx.isEmpty()) {
+      _pathAfterCtx = "/";
+  }
+  boolean _isHome = "/".equals(_pathAfterCtx) || "/index.jsp".equals(_pathAfterCtx);
+  boolean _showBack = !_isHome;
+  boolean _dashboardPage = _uri.contains("/company/dashboard") || _uri.contains("/student/dashboard");
   int _unread = 0;
   java.util.List<com.internlink.model.Notification> _recentNotes = java.util.Collections.emptyList();
   try {
@@ -26,11 +42,19 @@
       }
   } catch (Exception ignored) {}
 %>
+<c:if test="${sessionScope.userRole != 'ADMIN' and sessionScope.userRole != 'COMPANY'}">
 <nav class="navbar">
-  <a href="${pageContext.request.contextPath}/" class="navbar-brand">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <% if (_showBack && !_dashboardPage) { %>
+      <button type="button" class="btn btn-ghost btn-sm history-back" onclick="window.history.back()" aria-label="Go back">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    <% } %>
+    <a href="${pageContext.request.contextPath}/" class="navbar-brand">
     <span class="brand-icon">&#9670;</span>
     InternLink Nepal
-  </a>
+    </a>
+  </div>
 
   <div class="navbar-links">
     <a href="${pageContext.request.contextPath}/">Home</a>
@@ -76,6 +100,14 @@
           </div>
         </div>
         <c:choose>
+          <c:when test="${fn:startsWith(sessionScope.loggedInUser.profilePhotoUrl,'http')}">
+            <img src="${sessionScope.loggedInUser.profilePhotoUrl}" alt="Profile photo" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border);margin-right:8px;"/>
+          </c:when>
+          <c:otherwise>
+            <img src="${pageContext.request.contextPath}/${sessionScope.loggedInUser.profilePhotoUrl}" alt="Profile photo" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border);margin-right:8px;"/>
+          </c:otherwise>
+        </c:choose>
+        <c:choose>
           <c:when test="${sessionScope.userRole == 'STUDENT'}">
             <a href="${pageContext.request.contextPath}/student/dashboard" class="btn btn-outline btn-sm">Dashboard</a>
           </c:when>
@@ -108,3 +140,4 @@
   document.addEventListener('click', function(){ popup.style.display = 'none'; });
 })();
 </script>
+</c:if>

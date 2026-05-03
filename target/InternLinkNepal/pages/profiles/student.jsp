@@ -22,7 +22,10 @@
 }
 .pub-avatar-img { border-radius: 50%; width:110px; height:110px; }
 .pub-avatar-img {
-  width: 110px; height: 110px;
+  width: 110px;
+  height: 110px;
+  position: relative;
+  top: -300px;
   border-radius: 50%;
   object-fit: cover;
   border: 5px solid #fff;
@@ -115,14 +118,7 @@
       <div style="position:relative;margin-bottom:16px;">
         <div class="pub-cover"></div>
         <div class="pub-avatar-wrap">
-          <c:choose>
-            <c:when test="${not empty profile.profilePhoto}">
-              <img src="${pageContext.request.contextPath}/${profile.profilePhoto}" alt="${profile.fullName}" class="pub-avatar-img"/>
-            </c:when>
-            <c:otherwise>
-              <div class="pub-avatar-fallback">${fn:substring(profile.fullName,0,1)}</div>
-            </c:otherwise>
-          </c:choose>
+          <img src="${pageContext.request.contextPath}/${profile.profilePhotoUrl}" alt="${profile.fullName}" class="pub-avatar-img"/>
         </div>
         <div class="pub-profile-card">
           <div class="pub-profile-name">${profile.fullName}</div>
@@ -282,14 +278,7 @@
         <div class="pub-section-title">People in Similar Fields</div>
         <c:forEach var="person" items="${relatedProfiles}">
           <a href="${pageContext.request.contextPath}/profiles/student?id=${person.id}" class="related-card">
-            <c:choose>
-              <c:when test="${not empty person.profilePhoto}">
-                <img src="${pageContext.request.contextPath}/${person.profilePhoto}" alt="${person.fullName}" class="related-avatar"/>
-              </c:when>
-              <c:otherwise>
-                <div class="related-avatar-fb">${fn:substring(person.fullName,0,1)}</div>
-              </c:otherwise>
-            </c:choose>
+            <img src="${pageContext.request.contextPath}/${person.profilePhotoUrl}" alt="${person.fullName}" class="related-avatar"/>
             <div style="min-width:0;">
               <div class="related-name">${person.fullName}</div>
               <div class="related-sub">${person.program}</div>

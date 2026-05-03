@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="pageTitle" value="${company.companyName} - Company Profile"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <jsp:include page="/components/header.jsp"/>
 
 <style>
@@ -28,13 +29,13 @@
 .co-logo-box {
   position: absolute;
   bottom: -70px; left: 28px;
+  top:150px;
   width: 120px; height: 120px;
   border-radius: 28px;
   background: linear-gradient(135deg, #0d2645, #185FA5);
   border: 5px solid #fff;
   box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 46px; font-weight: 800; color: #fff;
+  object-fit: cover;
 }
 .co-hero-card {
   background: #fff;
@@ -95,14 +96,14 @@
 /* Sidebar */
 .co-info-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
 .co-info-row:last-child { border-bottom: none; }
-.co-info-icon { color: var(--text-secondary); flex-shrink: 0; margin-top: 1px; }
+.co-info-icon { color: var(--text-secondary); flex-shrink: 0; margin-top: 1px; width: 18px; text-align: center; }
 .co-info-label { font-weight: 600; color: var(--text-primary); }
 .co-info-value { color: var(--text-secondary); margin-top: 2px; }
 
 /* Expectation list */
 .co-expect-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; color: var(--text-secondary); }
 .co-expect-item:last-child { border-bottom: none; }
-.co-expect-icon { font-size: 18px; flex-shrink: 0; }
+.co-expect-icon { font-size: 16px; flex-shrink: 0; width: 22px; text-align: center; color: var(--primary); }
 </style>
 
 <div class="co-profile-wrap">
@@ -114,7 +115,7 @@
       <!-- Hero -->
       <div style="position:relative;margin-bottom:16px;">
         <div class="co-cover"></div>
-        <div class="co-logo-box">${fn:substring(company.companyName,0,1)}</div>
+        <img src="${pageContext.request.contextPath}/${company.logoUrl}" alt="${company.companyName}" class="co-logo-box"/>
         <div class="co-hero-card">
           <div class="co-name">${company.companyName}</div>
           <div class="co-meta">${company.industry} &bull; ${company.city}
@@ -128,12 +129,11 @@
           <div class="co-actions">
             <c:if test="${not empty company.website}">
               <a href="https://${company.website}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                Website
+                <i class="fa-solid fa-globe" style="margin-right:6px;"></i>Website
               </a>
             </c:if>
             <c:if test="${not empty company.email}">
-              <a href="mailto:${company.email}" class="btn btn-ghost btn-sm">Contact</a>
+              <a href="mailto:${company.email}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-envelope" style="margin-right:6px;"></i>Contact</a>
             </c:if>
           </div>
         </div>
@@ -193,7 +193,7 @@
           </c:when>
           <c:otherwise>
             <div class="co-video-placeholder">
-              <div style="font-size:40px;margin-bottom:12px;">&#127916;</div>
+              <div style="font-size:40px;margin-bottom:12px;color:var(--gray-400);"><i class="fa-solid fa-film"></i></div>
               <div style="font-size:15px;font-weight:700;margin-bottom:6px;">No culture video yet</div>
               <div style="font-size:13px;">This company hasn't uploaded a culture video yet. Check back later!</div>
             </div>
@@ -240,37 +240,37 @@
         <div class="co-section-title">Company Info</div>
         <c:if test="${not empty company.email}">
           <div class="co-info-row">
-            <svg class="co-info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <i class="fa-solid fa-envelope co-info-icon"></i>
             <div><div class="co-info-label">Email</div><div class="co-info-value">${company.email}</div></div>
           </div>
         </c:if>
         <c:if test="${not empty company.phone}">
           <div class="co-info-row">
-            <svg class="co-info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <i class="fa-solid fa-phone co-info-icon"></i>
             <div><div class="co-info-label">Phone</div><div class="co-info-value">${company.phone}</div></div>
           </div>
         </c:if>
         <c:if test="${not empty company.website}">
           <div class="co-info-row">
-            <svg class="co-info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <i class="fa-solid fa-globe co-info-icon"></i>
             <div><div class="co-info-label">Website</div><div class="co-info-value"><a href="https://${company.website}" target="_blank" style="color:var(--primary);">${company.website}</a></div></div>
           </div>
         </c:if>
         <c:if test="${not empty company.address}">
           <div class="co-info-row">
-            <svg class="co-info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <i class="fa-solid fa-location-dot co-info-icon"></i>
             <div><div class="co-info-label">Address</div><div class="co-info-value">${company.address}</div></div>
           </div>
         </c:if>
         <c:if test="${not empty company.foundedYear and company.foundedYear > 0}">
           <div class="co-info-row">
-            <svg class="co-info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <i class="fa-solid fa-calendar-days co-info-icon"></i>
             <div><div class="co-info-label">Founded</div><div class="co-info-value">${company.foundedYear}</div></div>
           </div>
         </c:if>
         <c:if test="${not empty company.employeeCount}">
           <div class="co-info-row">
-            <svg class="co-info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <i class="fa-solid fa-users co-info-icon"></i>
             <div><div class="co-info-label">Team Size</div><div class="co-info-value">${company.employeeCount} employees</div></div>
           </div>
         </c:if>
@@ -318,19 +318,19 @@
       <div class="co-section" style="margin-bottom:0;">
         <div class="co-section-title">What to Expect</div>
         <div class="co-expect-item">
-          <span class="co-expect-icon">&#128197;</span>
+          <i class="fa-solid fa-calendar-check co-expect-icon"></i>
           <span>Structured internship program with real project exposure and mentorship.</span>
         </div>
         <div class="co-expect-item">
-          <span class="co-expect-icon">&#127881;</span>
+          <i class="fa-solid fa-bullhorn co-expect-icon"></i>
           <span>Transparent information about roles, pay, and growth opportunities before applying.</span>
         </div>
         <div class="co-expect-item">
-          <span class="co-expect-icon">&#128101;</span>
+          <i class="fa-solid fa-handshake co-expect-icon"></i>
           <span>Collaborative work environment with experienced professionals.</span>
         </div>
         <div class="co-expect-item">
-          <span class="co-expect-icon">&#128188;</span>
+          <i class="fa-solid fa-briefcase co-expect-icon"></i>
           <span>Direct access to current openings for freshers, interns, and experienced candidates.</span>
         </div>
       </div>

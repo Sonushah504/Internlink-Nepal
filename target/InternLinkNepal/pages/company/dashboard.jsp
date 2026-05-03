@@ -3,6 +3,7 @@
 <%@ taglib prefix="fn"  uri="jakarta.tags.functions" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Company Dashboard – InternLink Nepal"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <jsp:include page="/components/header.jsp"/>
 
 <div class="dash-layout">
@@ -10,49 +11,54 @@
   <!-- ── Sidebar ──────────────────────────────────────────────── -->
   <aside class="dash-sidebar">
     <div class="dash-sidebar-brand">
-      <h3>${company.companyName}</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div class="company-logo-wrap" style="width:42px;height:42px;">
+          <img src="${pageContext.request.contextPath}/${company.logoUrl}" alt="${company.companyName}" class="company-logo-img"/>
+        </div>
+        <h3>${company.companyName}</h3>
+      </div>
       <p style="display:flex;align-items:center;gap:4px;">
         <c:choose>
-          <c:when test="${company.verified}"><span class="badge badge-verified" style="font-size:10px;">&#10003; Verified</span></c:when>
-          <c:otherwise><span class="badge badge-pending-co" style="font-size:10px;">Pending Verification</span></c:otherwise>
+          <c:when test="${company.verified}"><span class="badge badge-verified" style="font-size:10px;"><i class="fa-solid fa-circle-check"></i> Verified</span></c:when>
+          <c:otherwise><span class="badge badge-pending-co" style="font-size:10px;"><i class="fa-regular fa-clock"></i> Pending Verification</span></c:otherwise>
         </c:choose>
       </p>
     </div>
 
     <div class="sidebar-section-label">Dashboard</div>
     <a href="${pageContext.request.contextPath}/company/dashboard" class="sidebar-nav-item active">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".8"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/></svg>
+      <i class="fa-solid fa-table-cells-large nav-icon"></i>
       Overview
     </a>
     <a href="${pageContext.request.contextPath}/company/postJob" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M9 6v6M6 9h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <i class="fa-solid fa-circle-plus nav-icon"></i>
       Post a Job
     </a>
     <a href="${pageContext.request.contextPath}/company/jobs" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="5" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5"/></svg>
+      <i class="fa-solid fa-briefcase nav-icon"></i>
       My Job Posts
     </a>
 
     <div class="sidebar-section-label">Applicants</div>
     <a href="${pageContext.request.contextPath}/company/dashboard?expFilter=FRESHER" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 16c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.5"/></svg>
+      <i class="fa-solid fa-seedling nav-icon"></i>
       Freshers
       <span style="margin-left:auto;background:var(--success-light);color:var(--success);font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;">${fresherCount}</span>
     </a>
     <a href="${pageContext.request.contextPath}/company/dashboard?expFilter=INTERN" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 16c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.5"/></svg>
+      <i class="fa-solid fa-user-clock nav-icon"></i>
       Interns
       <span style="margin-left:auto;background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;">${internCount}</span>
     </a>
     <a href="${pageContext.request.contextPath}/company/dashboard?expFilter=EXPERIENCED" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 16c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.5"/></svg>
+      <i class="fa-solid fa-user-tie nav-icon"></i>
       Experienced
       <span style="margin-left:auto;background:var(--warning-light);color:var(--warning);font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;">${experiencedCount}</span>
     </a>
 
     <div class="sidebar-section-label">Company</div>
     <a href="${pageContext.request.contextPath}/company/profile" class="sidebar-nav-item">
-      <svg class="nav-icon" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M6 9h6M6 12h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <i class="fa-solid fa-id-card nav-icon"></i>
       Company Profile
     </a>
     <div style="padding:20px;margin-top:auto;">
@@ -69,36 +75,36 @@
         <h1>${company.companyName} Dashboard</h1>
         <p>${company.city} &bull; ${company.industry} &bull; ${company.employeeCount} employees</p>
       </div>
-      <a href="${pageContext.request.contextPath}/company/postJob" class="btn btn-primary">+ Post New Job</a>
+      <a href="${pageContext.request.contextPath}/company/postJob" class="btn btn-primary"><i class="fa-solid fa-plus" style="margin-right:6px;"></i>Post New Job</a>
     </div>
 
     <!-- Alerts -->
     <c:if test="${not empty param.success}">
-      <div class="alert alert-success" data-auto-dismiss>&#10003; ${param.success}</div>
+      <div class="alert alert-success" data-auto-dismiss><i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>${param.success}</div>
     </c:if>
     <c:if test="${not company.verified}">
-      <div class="alert alert-info">&#8505; Your company is pending admin verification. Job posts will be visible after approval.</div>
+      <div class="alert alert-info"><i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>Your company is pending admin verification. Job posts will be visible after approval.</div>
     </c:if>
 
     <!-- ── Metric Cards ──────────────────────────────────────── -->
     <div class="metric-cards">
       <div class="metric-card mc-blue">
-        <div class="mc-icon">&#128196;</div>
+        <div class="mc-icon"><i class="fa-solid fa-file-lines"></i></div>
         <div class="mc-label">Active Job Posts</div>
         <div class="mc-value">${totalJobs}</div>
       </div>
       <div class="metric-card mc-orange">
-        <div class="mc-icon">&#128101;</div>
+        <div class="mc-icon"><i class="fa-solid fa-users"></i></div>
         <div class="mc-label">Total Applicants</div>
         <div class="mc-value">${totalApplicants}</div>
       </div>
       <div class="metric-card mc-green">
-        <div class="mc-icon">&#127942;</div>
+        <div class="mc-icon"><i class="fa-solid fa-award"></i></div>
         <div class="mc-label">Shortlisted</div>
         <div class="mc-value">${shortlisted}</div>
       </div>
       <div class="metric-card mc-green">
-        <div class="mc-icon">&#127881;</div>
+        <div class="mc-icon"><i class="fa-solid fa-circle-check"></i></div>
         <div class="mc-label">Selected</div>
         <div class="mc-value">${selected}</div>
       </div>
@@ -112,7 +118,7 @@
             <h3 style="font-size:15px;font-weight:600;">Applicant &amp; Job Breakdown</h3>
             <p style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Who is applying and what type of roles are posted</p>
           </div>
-          <a href="${pageContext.request.contextPath}/profiles/company?id=${company.id}" class="btn btn-outline btn-sm" target="_blank">View Public Profile</a>
+          <a href="${pageContext.request.contextPath}/profiles/company?id=${company.id}" class="btn btn-outline btn-sm">View Public Profile</a>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr) 1px repeat(4,1fr);gap:0;">
           <!-- Applicant types -->
@@ -259,14 +265,7 @@
                    <!-- Applicant info -->
                   <td>
                     <div style="display:flex;align-items:center;gap:10px;">
-                      <c:choose>
-                        <c:when test="${not empty app.studentProfilePhoto}">
-                          <img src="${pageContext.request.contextPath}/${app.studentProfilePhoto}" alt="${app.studentName}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border);"/>
-                        </c:when>
-                        <c:otherwise>
-                          <div class="avatar">${fn:substring(app.studentName,0,1)}${fn:substring(app.studentName,fn:indexOf(app.studentName,' ')+1,fn:indexOf(app.studentName,' ')+2)}</div>
-                        </c:otherwise>
-                      </c:choose>
+                      <img src="${pageContext.request.contextPath}/${app.studentProfilePhotoUrl}" alt="${app.studentName}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--border);"/>
                       <div>
                         <a href="${pageContext.request.contextPath}/profiles/student?id=${app.studentId}" style="font-size:14px;font-weight:600;color:var(--primary);">${app.studentName}</a>
                         <div style="font-size:12px;color:var(--text-secondary);">${app.studentEmail}</div>
@@ -306,7 +305,7 @@
                               class="btn btn-outline btn-sm">Update</button>
                       <c:if test="${not empty app.studentCvPath}">
                         <a href="${pageContext.request.contextPath}/${app.studentCvPath}"
-                           target="_blank" class="btn btn-ghost btn-sm">CV</a>
+                           class="btn btn-ghost btn-sm">CV</a>
                       </c:if>
                     </div>
                   </td>
@@ -315,7 +314,7 @@
             </c:when>
             <c:otherwise>
               <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-secondary);">
-                <div style="font-size:32px;margin-bottom:12px;">&#128101;</div>
+                <div style="font-size:36px;margin-bottom:12px;color:var(--gray-400);"><i class="fa-solid fa-users"></i></div>
                 No applicants yet. <a href="${pageContext.request.contextPath}/company/postJob" style="color:var(--primary);">Post a job</a> to start receiving applications.
               </td></tr>
             </c:otherwise>

@@ -1,7 +1,9 @@
 package com.internlink.servlet.student;
 
 import com.internlink.dao.StudentProfileDAO;
+import com.internlink.dao.UserDAO;
 import com.internlink.model.StudentProfile;
+import com.internlink.model.User;
 import com.internlink.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -14,25 +16,27 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-@WebServlet("/student/profile")
+@WebServlet(name="/studentProfile",urlPatterns = "/student/profile")
 @MultipartConfig(maxFileSize = 5 * 1024 * 1024, maxRequestSize = 6 * 1024 * 1024)
 public class StudentProfileServlet extends HttpServlet {
 
     private final StudentProfileDAO profileDAO = new StudentProfileDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
             StudentProfile profile = profileDAO.findByUserId(SessionUtil.getUserId(req));
-            req.setAttribute("profile", profile);
-            if (profile != null) {
+            if (profile == null) {
+                profile = new StudentProfile();
+            } else {
                 req.setAttribute("relatedProfiles", profileDAO.findRelatedProfiles(profile.getUserId(), profile.getProgram(), profile.getUniversity(), profile.getExperienceType(), 6));
             }
+            req.setAttribute("profile", profile);
             req.getRequestDispatcher("/pages/student/profile.jsp").forward(req, resp);
         } catch (Exception e) {
             throw new ServletException("Unable to load student profile", e);
@@ -43,18 +47,50 @@ public class StudentProfileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
-            StudentProfile profile = profileDAO.findByUserId(SessionUtil.getUserId(req));
-            if (profile == null) {
-                profile = new StudentProfile();
-                profile.setUserId(SessionUtil.getUserId(req));
-                profileDAO.create(bindProfile(req, profile));
-            } else {
-                profileDAO.update(bindProfile(req, profile));
+            int userId = SessionUtil.getUserId(req);
+            StudentProfile existingProfile = profileDAO.findByUserId(userId);
+
+            if ("1".equals(req.getParameter("dashboardProfile"))) {
+                if (existingProfile == null) {
+                    resp.sendRedirect(req.getContextPath() + "/student/profile");
+                    return;
+                }
+                StudentProfile merged = mergeDashboardFields(req, existingProfile);
+                merged.setProfileScore(calculateProfileScore(merged));
+                profileDAO.update(merged);
+                resp.sendRedirect(req.getContextPath() + "/student/dashboard?profileSaved=1");
+                return;
             }
+
+            StudentProfile profile = bindProfile(req, existingProfile == null ? new StudentProfile() : existingProfile);
+            profile.setUserId(userId);
+
+            if (existingProfile == null) {
+                profileDAO.create(profile);
+            } else {
+                profileDAO.update(profile);
+            }
+
+            userDAO.updateProfilePhoto(userId, profile.getProfilePhoto());
+            User sessionUser = SessionUtil.getUser(req);
+            if (sessionUser != null) {
+                sessionUser.setProfilePhoto(profile.getProfilePhoto());
+                SessionUtil.setUser(req, sessionUser);
+            }
+
             resp.sendRedirect(req.getContextPath() + "/student/profile?success=1");
         } catch (Exception e) {
             throw new ServletException("Unable to save student profile", e);
         }
+    }
+
+    private StudentProfile mergeDashboardFields(HttpServletRequest req, StudentProfile profile) {
+        profile.setUniversity(req.getParameter("university"));
+        profile.setProgram(req.getParameter("program"));
+        profile.setSemester(parseInt(req.getParameter("semester")));
+        profile.setCgpa(parseDouble(req.getParameter("cgpa")));
+        profile.setExperienceType(req.getParameter("experienceType"));
+        return profile;
     }
 
     private StudentProfile bindProfile(HttpServletRequest req, StudentProfile profile) {
@@ -82,26 +118,17 @@ public class StudentProfileServlet extends HttpServlet {
                 return currentPath;
             }
 
-            String submitted = Paths.get(photo.getSubmittedFileName()).getFileName().toString();
+            String submitted = Path.of(photo.getSubmittedFileName()).getFileName().toString();
             String extension = "";
             int dot = submitted.lastIndexOf('.');
             if (dot >= 0) {
                 extension = submitted.substring(dot);
             }
 
-            // Store uploads outside the WAR so redeploys do not delete files
             String filename = UUID.randomUUID() + extension;
-            try {
-                Path target = com.internlink.util.StorageUtil.uploadsPath("profile", filename);
-                Files.copy(photo.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-                return com.internlink.util.StorageUtil.webPath("profile", filename);
-            } catch (Exception e) {
-                Path uploadDir = Paths.get(req.getServletContext().getRealPath("/uploads/profile"));
-                Files.createDirectories(uploadDir);
-                Path target = uploadDir.resolve(filename);
-                Files.copy(photo.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-                return "uploads/profile/" + filename;
-            }
+            Path target = com.internlink.util.StorageUtil.uploadsPath("profile_photos", filename);
+            Files.copy(photo.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+            return com.internlink.util.StorageUtil.webPath("profile_photos", filename);
         } catch (Exception e) {
             return currentPath;
         }

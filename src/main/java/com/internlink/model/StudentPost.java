@@ -29,6 +29,7 @@ public class StudentPost {
     public void setStudentUniversity(String studentUniversity) { this.studentUniversity = studentUniversity; }
     public String getStudentProfilePhoto() { return studentProfilePhoto; }
     public void setStudentProfilePhoto(String studentProfilePhoto) { this.studentProfilePhoto = studentProfilePhoto; }
+    public String getStudentProfilePhotoUrl() { return com.internlink.util.ProfilePhotoUtil.getProfilePhotoUrl(studentProfilePhoto); }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
     public String getMediaType() { return mediaType; }
